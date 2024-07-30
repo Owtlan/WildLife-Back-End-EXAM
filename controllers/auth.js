@@ -1,4 +1,4 @@
-const router = require('express').Router()
+const router = require('express').Router();
 const { isUser, isGuest } = require('../middleware/guards');
 const { register, login } = require('../services/user');
 const mapErrors = require('../util/mappers');
@@ -9,7 +9,7 @@ const mapErrors = require('../util/mappers');
 
 
 router.get('/register', isGuest(), (req, res) => {
-    res.render('register');
+    res.render('register', { title: 'Register Page' });
 });
 
 // TODO chek form action, method, field names
@@ -20,33 +20,38 @@ router.post('/register', isGuest(), async (req, res) => {
             throw new Error('Passwords don\'t match');
         }
 
-        const user = await register(req.body.username, req.body.password);
+        const user = await register(req.body.firstName, req.body.lastName, req.body.email, req.body.password);
         req.session.user = user;
         res.redirect('/'); //TODO chek redirect requriements
     } catch (err) {
         console.log(err)
         const errors = mapErrors(err)
-        res.render('register', { data: { username: req.body.username }, errors });
+        const data = {
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            email: req.body.email
+        };
+        res.render('register', { title: 'Register Page', data, errors });
     }
 
 });
 
 
 router.get('/login', isGuest(), (req, res) => {
-    res.render('login');
+    res.render('login', { title: 'Login Page' });
 })
 
-//  TODO chek form action,method,fields name
+
 router.post('/login', isGuest(), async (req, res) => {
     try {
-        const user = await login(req.body.username, req.body.password)
+        const user = await login(req.body.email, req.body.password)
         req.session.user = user;
-        res.redirect('/'); //TODO chek redirect requriements
+        res.redirect('/');
     }
     catch (err) {
         console.log(err);
         const errors = mapErrors(err)
-        res.render('login', { data: { username: req.body.username }, errors });
+        res.render('login', { title: 'Login Page', data: { email: req.body.email }, errors });
     }
 })
 

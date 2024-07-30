@@ -16,7 +16,7 @@ const userSchema = new Schema({
         }
     },
     lastName: {
-        type: String, minlength: [5, 'Last name must be at least 3 characters long'], validate: {
+        type: String, minlength: [5, 'Last name must be at least 5 characters long'], validate: {
             validator(value) {
                 return NAME_PATTERN.test(value)
             },
@@ -28,9 +28,9 @@ const userSchema = new Schema({
             validator(value) {
                 return EMAIL_PATTERN.test(value)
             },
-            message: 'Email may contain only english letters'
+            message: 'Email must be valid and may contain only english letters'
         }
-},
+    },
     hashedPassword: { type: String, required: true }
 });
 

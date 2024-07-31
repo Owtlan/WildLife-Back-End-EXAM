@@ -23,7 +23,7 @@ const postSchema = new Schema({
     description: { type: String, minlength: [8, 'Description must be at most 8 characters long'] },
     author: { type: ObjectId, ref: 'User', required: true },
     votes: { type: [ObjectId], ref: 'User', default: [] },
-    rating: { type: Number, default: 0 }
+    rating: { type: Number, default: 0 },
 })
 
 

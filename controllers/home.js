@@ -15,6 +15,15 @@ router.get('/catalog', async (req, res) => {
 router.get('/catalog/:id', async (req, res) => {
     const id = req.params.id;
     const post = postViewModel(await getPostById(id))
+
+    if (req.session.user) {
+        post.hasUser = true
+        if (req.session.user._id == post.author._id) {
+            post.isAuthor = true;
+        }
+        //TODO CHEK VOTES
+    }
+
     res.render('details', { title: post.title, post });
 });
 

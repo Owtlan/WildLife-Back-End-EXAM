@@ -4,7 +4,11 @@ const { createPost } = require('../services/post')
 const { mapErrors } = require('../util/mappers')
 const { postViewModel } = require('../util/mappers')
 const { getPosts, getPostById } = require('../services/post');
-const { updatePost} = require('../services/post')
+const { updatePost } = require('../services/post')
+const { deletePost } = require('../services/post')
+
+
+
 router.get('/create', isUser(), (req, res) => {
     res.render('create', { title: 'Create Post' })
 })
@@ -48,6 +52,12 @@ router.get('/edit/:id', isUser(), async (req, res) => {
 
 router.post('/edit/:id', isUser(), async (req, res) => {
     const id = req.params.id;
+    const existing = postViewModel(await getPostById(id))
+
+    if (req.session.user._id != existing.author._id) {
+        return res.redirect('/login')
+    }
+
     const post = {
         title: req.body.title,
         keyword: req.body.keyword,
@@ -63,9 +73,32 @@ router.post('/edit/:id', isUser(), async (req, res) => {
     } catch (err) {
         console.error(err);
         const errors = mapErrors(err)
+        post._id = id
         res.render('edit', { title: 'Edit Post', post, errors });
     }
 })
 
+
+router.get('/delete/:id', isUser(), async (req, res) => {
+
+    const id = req.params.id;
+    const existing = postViewModel(await getPostById(id))
+
+    if (req.session.user._id != existing.author._id) {
+        return res.redirect('/login')
+    }
+
+
+    try {
+        await deletePost(id)
+        res.redirect('/catalog')
+    } catch (err) {
+        console.error(err);
+        const errors = mapErrors(err)
+
+        res.render('/catalog/' + id, { title: existing.title, errors });
+    }
+
+})
 
 module.exports = router

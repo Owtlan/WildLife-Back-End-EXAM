@@ -1,12 +1,13 @@
 const router = require('express').Router()
 const { isUser } = require('../middleware/guards')
-const { createPost } = require('../services/post')
-const { mapErrors } = require('../util/mappers')
-const { postViewModel } = require('../util/mappers')
-const { getPosts, getPostById } = require('../services/post');
-const { updatePost } = require('../services/post')
-const { deletePost } = require('../services/post')
-
+const { createPost, getPostById, updatePost, deletePost, vote } = require('../services/post');
+const { mapErrors, postViewModel } = require('../util/mappers')
+// const { createPost } = require('../services/post')
+// const { postViewModel } = require('../util/mappers')
+// const { updatePost } = require('../services/post')
+// da probvam da gi subera na edno
+// const { deletePost } = require('../services/post')
+// const { vote } = require('../services/post')
 
 
 router.get('/create', isUser(), (req, res) => {
@@ -96,9 +97,27 @@ router.get('/delete/:id', isUser(), async (req, res) => {
         console.error(err);
         const errors = mapErrors(err)
 
-        res.render('/catalog/' + id, { title: existing.title, errors });
+        res.render('details', { title: existing.title, errors });
     }
 
 })
+
+router.get('/vote/:id/:type', isUser(), async (req, res) => {
+
+    const id = req.params.id;
+    const value = req.params.type == 'upvote' ? 1 : - 1;
+
+    try {
+        await vote(id, req.session.user._id, value)
+        res.redirect('/catalog/' + id)
+    } catch (err) {
+        console.error(err);
+        const errors = mapErrors(err)
+
+        res.render('details', { title: 'Post Details', errors });
+    }
+})
+
+
 
 module.exports = router

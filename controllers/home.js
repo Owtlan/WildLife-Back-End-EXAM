@@ -1,5 +1,6 @@
-const { getPosts, getPostById } = require('../services/post');
+const { getPosts, getPostById, getPostByAuthor } = require('../services/post');
 const { postViewModel } = require('../util/mappers');
+const { isUser } = require('../middleware/guards')
 const router = require('express').Router()
 
 router.get('/', (req, res) => {
@@ -27,5 +28,10 @@ router.get('/catalog/:id', async (req, res) => {
 
     res.render('details', { title: post.title, post });
 });
+
+router.get('/profile', isUser(), async (req, res) => {
+    const posts = (await getPostByAuthor(req.session.user._id)).map(postViewModel);
+    res.render('profile', { title: 'My Posts', posts })
+})
 
 module.exports = router

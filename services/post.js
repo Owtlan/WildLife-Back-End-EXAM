@@ -13,9 +13,14 @@ async function getPosts() {
     return Post.find({})
 }
 
+async function getPostByAuthor(userId) {
+    return Post.find({ author: userId }).populate('author', 'firstName lastName')
+}
+
+
 async function getPostById(id) {
     // here i need to put lastName in empty field and to working but for now cant
-    return Post.findById(id).populate('author', 'firstName lastName');
+    return Post.findById(id).populate('author', 'firstName lastName').populate('votes', 'email');
 }
 
 
@@ -54,9 +59,11 @@ async function vote(postId, userId, value) {
 
 module.exports = {
     createPost,
+    getPostByAuthor,
     getPosts,
     getPostById,
     updatePost,
     deletePost,
-    vote
+    vote,
+
 }
